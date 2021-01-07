@@ -234,7 +234,10 @@ var _ = Describe("Client", func() {
 		It("returns a response", func() {
 			rspBuf := &bytes.Buffer{}
 			rw := newResponseWriter(rspBuf, utils.DefaultLogger)
+			rw.Header().Add("Content-Type", "application/json")
+			rw.Header().Add("Content-Length", "24")
 			rw.WriteHeader(418)
+			rw.Write([]byte("{\"error\":\"I'm a teapot\"}"))
 			rw.Flush()
 
 			gomock.InOrder(
@@ -252,6 +255,7 @@ var _ = Describe("Client", func() {
 			Expect(rsp.Proto).To(Equal("HTTP/3"))
 			Expect(rsp.ProtoMajor).To(Equal(3))
 			Expect(rsp.StatusCode).To(Equal(418))
+			Expect(rsp.ContentLength).To(Equal(int64(24)))
 		})
 
 		Context("validating the address", func() {
