@@ -281,6 +281,11 @@ func (c *client) doRequest(
 		res.Uncompressed = true
 	} else {
 		res.Body = respBody
+		if contentLengthStr := res.Header.Get("Content-Length"); contentLengthStr != "" {
+			if contentLength, err := strconv.ParseInt(contentLengthStr, 10, 64); err == nil {
+				res.ContentLength = contentLength
+			}
+		}
 	}
 
 	return res, requestError{}
